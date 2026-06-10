@@ -1,9 +1,8 @@
 from colorama import Fore
-from tokens import tokens, peremem_nubers_name
+from util.tokens import tokens, peremem_nubers_name
 
 
 def is_numeric(value):
-    """Проверяет, является ли значение числом"""
     value = value.strip().strip('"').strip("'")
     try:
         float(value)
@@ -12,8 +11,8 @@ def is_numeric(value):
         return False
 
 
-def Parser():
-    with open("build/main.js", "a") as f:
+def Parser(js_name):
+    with open(f"build/{js_name}", "a") as f:
         for token in tokens:
             if token.lex is None:
                 if "%=" in token.content and "%=%" not in token.content:

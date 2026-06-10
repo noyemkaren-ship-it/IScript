@@ -1,7 +1,7 @@
 
 from colorama import Fore, Style
-from tokens import tokens
-from Token import Token
+from util.tokens import tokens
+from util.Token import Token
 
 commands = {
     "print ",
