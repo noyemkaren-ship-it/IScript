@@ -3,6 +3,7 @@ from util.Parser import Parser
 from util.Lexer import AntiBag
 from util.dirs import create_dirs
 from colorama import Fore
+print(Fore.GREEN + "Создания папок")
 create_dirs()
 what_compilat = str(input("Названия ФАЙЛА в script: "))
 bek_compilat = str(input("Названия ФАЙЛА который создаться в  build  вы хотите скомпилировать: "))
