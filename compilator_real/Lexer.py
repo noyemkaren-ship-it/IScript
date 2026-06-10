@@ -1,6 +1,5 @@
-import is_numeric
-from colorama import Fore, Style
 
+from colorama import Fore, Style
 from tokens import tokens
 from Token import Token
 

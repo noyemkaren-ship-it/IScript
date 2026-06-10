@@ -1,6 +1,6 @@
 from Lexer import CreateToken
 from Parser import Parser
-from compilator_real.Lexer import AntiBag
+from Lexer import AntiBag
 from dirs import create_dirs
 from colorama import Fore
 
