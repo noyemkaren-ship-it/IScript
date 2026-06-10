@@ -1,3 +1,4 @@
+import is_numeric
 from colorama import Fore, Style
 
 from tokens import tokens
@@ -8,8 +9,6 @@ commands = {
     "echo ",
     "fun "
 }
-
-
 def Lexer(token):
     for lex in commands:
         if lex in token:
