@@ -6,7 +6,8 @@ from util.Token import Token
 commands = {
     "print ",
     "echo ",
-    "fun "
+    "fun ",
+    "startS "
 }
 def Lexer(token):
     for lex in commands:

@@ -1,6 +1,8 @@
 from colorama import Fore
 from util.tokens import tokens, peremem_nubers_name
 
+from compilator_real.util.Token import Token
+
 
 def is_numeric(value):
     value = value.strip().strip('"').strip("'")
@@ -21,13 +23,6 @@ def Parser(js_name):
                     f.write(f'let {peremen} = {value};\n')
                     if is_numeric(value):
                         peremem_nubers_name.append(peremen.strip())
-                    continue
-                if "startS " in token.content:
-                    server_port = token.content[7:].strip()
-                    f.write(f"app.listen({server_port}, () => " + "{" + "\n")
-                    f.write(f"  console.log('🚀ЗАПУСК СЕРВЕРА🚀');\n")
-                    f.write(f"  console.log('\x1b[34m Сервер запущен на порт ->{server_port} \x1b[0m');\n")
-                    f.write("});\n")
                     continue
                 if "#=" in token.content and "%=%" not in token.content:
                     peremen, content = token.content.split('#=')
@@ -72,7 +67,13 @@ def Parser(js_name):
                             f.write(f"{token.indent}    this.{field} = {field};\n")
                         f.write(f"{token.indent}}}\n")
                     continue
-                f.write(f"{token.content}\n")
+                if "if" in token.content or "elif" in token.content or "else" in token.content or "while" in token.content or "for" in token.content or "function" in token.content or "fun" or token.content.strip().endswith("{"):
+                    f.write(f"{token.content}\n")
+                elif token.content.strip().endswith("n^"):
+                    f.write(f"{token.content}\n")
+                else:
+                    f.write(f"{token.content};\n")
+                    print(f"В строке {token.content} была автоматический добавлена ; если я поставил лишнее то просто в конец добавьте n^")
                 continue
 
             if "echo " in token.lex:
@@ -82,6 +83,13 @@ def Parser(js_name):
             elif "print " in token.lex:
                 content = token.content.strip()
                 f.write(f'{token.indent}alert({content});\n')
+                continue
+            elif "startS " in token.lex:
+                server_port = token.content.scrip()
+                f.write(f"app.listen({server_port}, () => " + "{" + "\n")
+                f.write(f"  console.log('🚀ЗАПУСК СЕРВЕРА🚀');\n")
+                f.write(f"  console.log('\x1b[34m Сервер запущен на порт ->{server_port} \x1b[0m');\n")
+                f.write("});\n")
                 continue
             elif "fun " in token.lex:
                 f.write(f"{token.indent}function {token.content}\n")

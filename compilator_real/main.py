@@ -1,3 +1,4 @@
+from compilator_real.util.parserHtml import parser_html
 from util.Lexer import CreateToken
 from util.Parser import Parser
 from util.Lexer import AntiBag
@@ -11,15 +12,21 @@ create_dirs()
 if len(sys.argv) < 2:
     print(Fore.RED + "Укажите файл для компиляции: iscript main.i")
     sys.exit(1)
+html_file_name = ""
 
 input_file = sys.argv[1]
 what_compilat = input_file
 bek_compilat = os.path.splitext(os.path.basename(input_file))[0] + ".js"
 
+html_mode = False
+
 print(Fore.BLUE + f"ИЩУ {what_compilat}")
 
 with open(f"build/{bek_compilat}", "w") as file:
     file.write("// Compiler\n")
+
+print("WARNING")
+print("ПРЕДУПРЕЖДЕНИЕ ЗАРАНЕЕ ; НЕ НУНЖЫ ВООБЩЕ !")
 
 try:
     with open(f"script/{what_compilat}", "r") as f:
@@ -50,6 +57,20 @@ try:
 
         for line in f:
             st += 1
+
+            if line.startswith("initS"):
+                continue
+            elif line.startswith("html "):
+                html_mode = True
+                html_file_name = line[len("html "):].strip()
+                with open(f"build/{bek_compilat}", "w") as fule:
+                    fule.write("\n")
+                continue
+            elif line.startswith("html-end"):
+                html_mode = False
+                continue
+            elif html_mode:
+                parser_html(html_file_name, line)
             AntiBag(line, st)
             CreateToken(line)
 except FileNotFoundError:
