@@ -22,7 +22,13 @@ def Parser(js_name):
                     if is_numeric(value):
                         peremem_nubers_name.append(peremen.strip())
                     continue
-
+                if "startS " in token.content:
+                    server_port = token.content[7:].strip()
+                    f.write(f"app.listen({server_port}, () => " + "{" + "\n")
+                    f.write(f"  console.log('🚀ЗАПУСК СЕРВЕРА🚀');\n")
+                    f.write(f"  console.log('\x1b[34m Сервер запущен на порт ->{server_port} \x1b[0m');\n")
+                    f.write("});\n")
+                    continue
                 if "#=" in token.content and "%=%" not in token.content:
                     peremen, content = token.content.split('#=')
                     value = content.strip()

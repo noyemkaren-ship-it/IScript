@@ -18,12 +18,14 @@ bek_compilat = os.path.splitext(os.path.basename(input_file))[0] + ".js"
 
 print(Fore.BLUE + f"ИЩУ {what_compilat}")
 
+with open(f"build/{bek_compilat}", "w") as file:
+    file.write("// Compiler\n")
+
 try:
     with open(f"script/{what_compilat}", "r") as f:
         st = 0
         if "AppHtml" in f.read() or "AppApend" in f.read():
-            with open(f"build/{bek_compilat}", "w") as f:
-                f.write("// Compiler functions\n")
+            with open(f"build/{bek_compilat}", "a") as f:
                 f.write("import { writeFile, readFile, appendFile } from 'node:fs/promises';\n")
                 f.write("import { join } from 'node:path';\n")
                 f.write(" \n")
@@ -38,9 +40,13 @@ try:
                 f.write("   await appendFile(filePath, code, 'utf-8');\n")
                 f.write("   console.log('Файл успешно обновлен.');\n")
                 f.write("}\n")
-        else:
-            with open(f"build/{bek_compilat}", "w") as file:
-                file.write("// Compiler\n")
+
+        if "initS" in f.read():
+            with open(f"build/{bek_compilat}", "a") as fule:
+                fule.write("const const express = require('express');\n")
+                fule.write("const app = express();\n")
+                fule.write("const path = require('path');\n")
+            print("Константы express и app и path были созданы автоматический!")
 
         for line in f:
             st += 1
