@@ -10,8 +10,14 @@ bek_compilat = str(input("Названия ФАЙЛА который созда�
 print(Fore.BLUE + f"ИЩУ {what_compilat} В ПАПКЕ script")
 
 with open(f"build/{bek_compilat}", "w") as f:
-    f.write("// Compiler\n")
-
+    f.write("// Compiler functions\n")
+    f.write("import { writeFile, readFile, appendFile } from 'node:fs/promises';\n")
+    f.write("import { join } from 'node:path';\n")
+    f.write("async function AppHtml(file, code) {\n")
+    f.write("   const filePath = join(process.cwd(), file);\n")
+    f.write("   await writeFile(filePath, code, 'utf-8');")
+    f.write("   console.log('Файл успешно создан.');\n")
+    f.write("}\n")
 try:
     with open(f"script/{what_compilat}", "r") as f:
         st = 0

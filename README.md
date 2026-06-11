@@ -24,6 +24,13 @@ python compilator_real/main.py
 
 Открой build/main.js — готовый JavaScript!
 
+## СОЗДАНИЯ HTML СПОМОЩЬЮ JS
+ВАМ НУЖНО ИСПОЛЬЗОВАТЬ ФУНКЦИЮ AppHtml("Имя файла", "html code тут пишите ваш html")
+Пример:
+const html = `
+< p >Ваш html code < p >`;
+AppHtml("Путь к файлу", html);
+
 ## 📝 Полный синтаксис
 
 ### Вывод данных
