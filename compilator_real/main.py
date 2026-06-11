@@ -18,27 +18,30 @@ bek_compilat = os.path.splitext(os.path.basename(input_file))[0] + ".js"
 
 print(Fore.BLUE + f"ИЩУ {what_compilat}")
 
-# Остальной код без изменений...
-with open(f"build/{bek_compilat}", "w") as f:
-    f.write("// Compiler functions\n")
-    f.write("import { writeFile, readFile, appendFile } from 'node:fs/promises';\n")
-    f.write("import { join } from 'node:path';\n")
-    f.write(" \n")
-    f.write("async function AppHtml(file, code) {\n")
-    f.write("   const filePath = join(process.cwd(), file);\n")
-    f.write("   await writeFile(filePath, code, 'utf-8');")
-    f.write("   console.log('Файл успешно создан.');\n")
-    f.write("}\n")
-    f.write(" \n")
-    f.write("async function AppApend(file, code) {\n")
-    f.write("   const filePath = join(process.cwd(), file);\n")
-    f.write("   await appendFile(filePath, code, 'utf-8');\n")
-    f.write("   console.log('Файл успешно обновлен.');\n")
-    f.write("}\n")
-
 try:
     with open(f"script/{what_compilat}", "r") as f:
         st = 0
+        if "AppHtml" in f.read() or "AppApend" in f.read():
+            with open(f"build/{bek_compilat}", "w") as f:
+                f.write("// Compiler functions\n")
+                f.write("import { writeFile, readFile, appendFile } from 'node:fs/promises';\n")
+                f.write("import { join } from 'node:path';\n")
+                f.write(" \n")
+                f.write("async function AppHtml(file, code) {\n")
+                f.write("   const filePath = join(process.cwd(), file);\n")
+                f.write("   await writeFile(filePath, code, 'utf-8');")
+                f.write("   console.log('Файл успешно создан.');\n")
+                f.write("}\n")
+                f.write(" \n")
+                f.write("async function AppApend(file, code) {\n")
+                f.write("   const filePath = join(process.cwd(), file);\n")
+                f.write("   await appendFile(filePath, code, 'utf-8');\n")
+                f.write("   console.log('Файл успешно обновлен.');\n")
+                f.write("}\n")
+        else:
+            with open(f"build/{bek_compilat}", "w") as file:
+                file.write("// Compiler\n")
+
         for line in f:
             st += 1
             AntiBag(line, st)
