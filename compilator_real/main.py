@@ -13,10 +13,17 @@ with open(f"build/{bek_compilat}", "w") as f:
     f.write("// Compiler functions\n")
     f.write("import { writeFile, readFile, appendFile } from 'node:fs/promises';\n")
     f.write("import { join } from 'node:path';\n")
+    f.write(" \n")
     f.write("async function AppHtml(file, code) {\n")
     f.write("   const filePath = join(process.cwd(), file);\n")
     f.write("   await writeFile(filePath, code, 'utf-8');")
     f.write("   console.log('Файл успешно создан.');\n")
+    f.write("}\n")
+    f.write(" \n")
+    f.write("async function AppApend(file, code) {\n")
+    f.write("   const filePath = join(process.cwd(), file);\n")
+    f.write("   await appendFile(filePath, code, 'utf-8');\n")
+    f.write("   console.log('Файл успешно обновлен.');\n")
     f.write("}\n")
 try:
     with open(f"script/{what_compilat}", "r") as f:
