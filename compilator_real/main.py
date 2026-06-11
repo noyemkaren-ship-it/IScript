@@ -3,12 +3,22 @@ from util.Parser import Parser
 from util.Lexer import AntiBag
 from util.dirs import create_dirs
 from colorama import Fore
-print(Fore.GREEN + "Создания папок")
-create_dirs()
-what_compilat = str(input("Названия ФАЙЛА в script: "))
-bek_compilat = str(input("Названия ФАЙЛА который создаться в  build  вы хотите скомпилировать: "))
-print(Fore.BLUE + f"ИЩУ {what_compilat} В ПАПКЕ script")
+import sys
+import os
 
+print(Fore.GREEN + "Создание папок")
+create_dirs()
+if len(sys.argv) < 2:
+    print(Fore.RED + "Укажите файл для компиляции: iscript main.i")
+    sys.exit(1)
+
+input_file = sys.argv[1]
+what_compilat = input_file
+bek_compilat = os.path.splitext(os.path.basename(input_file))[0] + ".js"
+
+print(Fore.BLUE + f"ИЩУ {what_compilat}")
+
+# Остальной код без изменений...
 with open(f"build/{bek_compilat}", "w") as f:
     f.write("// Compiler functions\n")
     f.write("import { writeFile, readFile, appendFile } from 'node:fs/promises';\n")
@@ -25,6 +35,7 @@ with open(f"build/{bek_compilat}", "w") as f:
     f.write("   await appendFile(filePath, code, 'utf-8');\n")
     f.write("   console.log('Файл успешно обновлен.');\n")
     f.write("}\n")
+
 try:
     with open(f"script/{what_compilat}", "r") as f:
         st = 0
