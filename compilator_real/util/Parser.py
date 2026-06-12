@@ -7,21 +7,21 @@ def is_numeric(value):
     try:
         float(value)
         return True
-    except:
+    except ValueError:  # Исправлено: конкретное исключение
         return False
 
 
 def Parser(js_name):
     backtic = False
     skobki = False
-    with open(f"build/{js_name}", "a") as f:
+    with open(f"build/{js_name}", "a", encoding="utf-8") as f:  # Добавлена кодировка
         for token in tokens:
             if token.content.strip() == "":
                 continue
 
             if token.lex is None:
                 if "%=" in token.content and "%=%" not in token.content:
-                    peremen, content = token.content.split('%=')
+                    peremen, content = token.content.split('%=', 1)  # Исправлено: ограничение split
                     value = content.strip()
                     f.write(f'let {peremen} = {value};\n')
                     if is_numeric(value):
@@ -29,13 +29,13 @@ def Parser(js_name):
                     continue
 
                 if "#=" in token.content and "%=%" not in token.content:
-                    peremen, content = token.content.split('#=')
+                    peremen, content = token.content.split('#=', 1)  # Исправлено: ограничение split
                     value = content.strip()
                     f.write(f'const {peremen} = {value};\n')
                     continue
 
                 elif "^=" in token.content:
-                    peremen, content = token.content.split('^=')
+                    peremen, content = token.content.split('^=', 1)  # Исправлено: ограничение split
                     peremen = peremen.strip()
                     value = content.strip()
                     if peremen in peremem_nubers_name:
@@ -43,12 +43,13 @@ def Parser(js_name):
                             f.write(f'{peremen} = {value};\n')
                         else:
                             print(Fore.RED + f"❌ ОШИБКА: Переменная {peremen} ЧИСЛОВАЯ, нельзя присвоить '{value}'!")
+                            continue  # Добавлено: пропускаем запись при ошибке
                     else:
-                        f.write(f'{peremen} = {value};\n')  # ← работает для всего
+                        f.write(f'{peremen} = {value};\n')
                     continue
 
                 elif "%=%" in token.content:
-                    peremen, content = token.content.split('%=%')
+                    peremen, content = token.content.split('%=%', 1)  # Исправлено: ограничение split
                     value = content.strip()
                     f.write(f'let {peremen.strip()} = {value};\n')
                     f.write(f'console.log({peremen.strip()});\n')
@@ -63,7 +64,7 @@ def Parser(js_name):
                 elif "TypeLego " in token.content:
                     content = token.content[9:].strip()
                     if " *=* " in content:
-                        class_name, fields_str = content.split(" *=* ")
+                        class_name, fields_str = content.split(" *=* ", 1)  # Исправлено: ограничение split
                         class_name = class_name.strip()
                         fields = [f.strip() for f in fields_str.split("%")]
                         f.write(f"{token.indent}function {class_name}({', '.join(fields)}) {{\n")
@@ -72,24 +73,28 @@ def Parser(js_name):
                         f.write(f"{token.indent}}}\n")
                     continue
 
-                if token.content.strip().endswith("`"):
+                # Исправлена логика обработки backtic
+                if "`" in token.content.strip():
                     clean = token.content.strip()
-                    if clean.count("`") < 2 and backtic == False:
-                        backtic = True
-                    elif clean.count("`") < 2 and backtic:
-                        backtic = False
+                    if clean.count("`") % 2 == 1:  # Нечётное количество - переключение
+                        backtic = not backtic
 
-                if token.content.strip().endswith("(") and skobki == False and backtic == False:
+                # Исправлена логика обработки скобок
+                if "(" in token.content.strip() and not backtic:
                     skobki = True
-                elif token.content.strip().endswith(")") and skobki == True and backtic == False:
+                if ")" in token.content.strip() and not backtic:
                     skobki = False
 
-                if "if" in token.content or "elif" in token.content or "else" in token.content or "while" in token.content or "for" in token.content or "function" in token.content or "fun " in token.content or token.content.strip().endswith(
-                        "{") or "(" in token.content or backtic or skobki or token.content.strip().endswith("}"):
+                # Упрощённая проверка условий
+                if any(keyword in token.content for keyword in ["if", "elif", "else", "while", "for", "function"]) or \
+                   "fun " in token.content or \
+                   token.content.strip().endswith(("{", "}")) or \
+                   "(" in token.content or \
+                   backtic or skobki:
                     f.write(f"{token.content}\n")
                     continue
 
-                elif token.content.strip().endswith("n^") or token.content.strip().endswith("^n"):
+                elif token.content.strip().endswith(("n^", "^n")):
                     f.write(f"{token.content.replace('n^', '').replace('^n', '')}\n")
                     continue
 
@@ -140,7 +145,7 @@ def Parser(js_name):
                 continue
 
             elif "startS " in token.lex:
-                server_port = token.content.strip()  # ← ИСПРАВЛЕНО: strip вместо scrip
+                server_port = token.content.strip()  # Исправлено: было scrip, стало strip
                 f.write(f"app.listen({server_port}, () => {{\n")
                 f.write(f"  console.log('🚀 ЗАПУСК СЕРВЕРА 🚀');\n")
                 f.write(f"  console.log('\\x1b[34m Сервер запущен на порту -> {server_port} \\x1b[0m');\n")
