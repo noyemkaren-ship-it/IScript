@@ -11,14 +11,22 @@ commands = {
     "post ",
     "put ",
     "delete ",
-    "send ",   # ← ДОБАВЛЕНО: чтобы send тоже был командой
-    "json "    # ← ДОБАВЛЕНО: чтобы json тоже был командой
+    "send ",
+    "json "
 }
 
+
 def Lexer(token):
+    # Ищем самую длинную команду, которая есть в строке
+    found_lex = None
     for lex in commands:
         if lex in token:
-            return lex, token
+            # Выбираем самую длинную совпавшую команду
+            if found_lex is None or len(lex) > len(found_lex):
+                found_lex = lex
+
+    if found_lex:
+        return found_lex, token
     return None
 
 
@@ -26,16 +34,21 @@ def CreateToken(token):
     result = Lexer(token)
 
     if result is None:
-        tokens.append(Token(lex=None, content=token))
+        tokens.append(Token(lex=None, content=token, indent=""))
     else:
         lex, line = result
+        # Находим позицию команды в строке
         content_position = line.find(lex)
+        # Отступ - это всё, что до команды
         indent = line[:content_position]
-        clear_content = line[content_position + len(lex):].strip()
-        # ← ИСПРАВЛЕНО: убираем { и } из content, если они там есть
+        # Контент - это всё после команды
+        content = line[content_position + len(lex):]
+        # Убираем фигурные скобки из контента
+        clear_content = content.strip()
         clear_content = clear_content.rstrip('{').strip().rstrip('}').strip()
+
         tokens.append(Token(
-            lex=indent + lex,
+            lex=lex.strip(),  # Сохраняем чистую команду без отступа
             content=clear_content,
             indent=indent
         ))

@@ -19,15 +19,17 @@ def Parser(js_name):
             if token.content.strip() == "":
                 continue
 
+            # Получаем отступ из токена
+            indent = token.indent if hasattr(token, 'indent') and token.indent else ''
+
             if token.lex is None:
                 if "%=" in token.content and "%=%" not in token.content:
-                    # ИСПРАВЛЕНО: Сохраняем оригинальный контент с отступами
                     original_content = token.content
                     if " %= " in original_content:
                         peremen, content = original_content.split(' %= ', 1)
                     else:
                         peremen, content = original_content.split('%=', 1)
-                    indent = token.indent if hasattr(token, 'indent') else ''
+
                     value = content.strip()
                     peremen_clean = peremen.strip()
 
@@ -44,7 +46,6 @@ def Parser(js_name):
                     else:
                         peremen, content = original_content.split('#=', 1)
 
-                    indent = token.indent if hasattr(token, 'indent') else ''
                     value = content.strip()
                     peremen_clean = peremen.strip()
 
@@ -58,7 +59,6 @@ def Parser(js_name):
                     else:
                         peremen, content = original_content.split('^=', 1)
 
-                    indent = token.indent if hasattr(token, 'indent') else ''
                     peremen = peremen.strip()
                     value = content.strip()
 
@@ -79,7 +79,6 @@ def Parser(js_name):
                     else:
                         peremen, content = original_content.split('%=%', 1)
 
-                    indent = token.indent if hasattr(token, 'indent') else ''
                     value = content.strip()
                     peremen_clean = peremen.strip()
 
@@ -91,7 +90,6 @@ def Parser(js_name):
                     continue
 
                 elif "typeC " in token.content:
-                    indent = token.indent if hasattr(token, 'indent') else ''
                     func_def = token.content[6:].strip()
                     if not func_def.endswith('{'):
                         f.write(f"{indent}function {func_def} {{\n")
@@ -105,10 +103,10 @@ def Parser(js_name):
                         class_name, fields_str = content.split(" *=* ", 1)
                         class_name = class_name.strip()
                         fields = [f.strip() for f in fields_str.split("%")]
-                        f.write(f"{token.indent}function {class_name}({', '.join(fields)}) {{\n")
+                        f.write(f"{indent}function {class_name}({', '.join(fields)}) {{\n")
                         for field in fields:
-                            f.write(f"{token.indent}    this.{field} = {field};\n")
-                        f.write(f"{token.indent}}}\n")
+                            f.write(f"{indent}    this.{field} = {field};\n")
+                        f.write(f"{indent}}}\n")
                     continue
 
                 if "`" in token.content.strip():
@@ -127,71 +125,68 @@ def Parser(js_name):
                         token.content.strip().endswith(("{", "}")) or \
                         "(" in token.content or \
                         backtic or skobki:
-                    # Сохраняем оригинальный контент с отступами
-                    f.write(f"{token.content}\n")
+                    f.write(f"{indent}{token.content}\n")
                     continue
 
                 elif token.content.strip().endswith(("n^", "^n")):
-                    f.write(f"{token.content.replace('n^', '').replace('^n', '')}\n")
+                    f.write(f"{indent}{token.content.replace('n^', '').replace('^n', '')}\n")
                     continue
 
                 else:
-                    # Сохраняем оригинальный контент с отступами
-                    f.write(f"{token.content};\n")
+                    f.write(f"{indent}{token.content};\n")
                     continue
 
             # ===== ОСНОВНЫЕ КОМАНДЫ =====
 
-            if "echo " in token.lex:
+            if token.lex and "echo " in token.lex:
                 content = token.content.strip()
-                f.write(f'{token.indent}console.log({content});\n')
+                f.write(f'{indent}console.log({content});\n')
                 continue
 
-            elif "get " in token.lex:
+            elif token.lex and "get " in token.lex:
                 path = token.content.strip()
-                f.write(f"{token.indent}app.get({path}, (req, res) => {{\n")
+                f.write(f"{indent}app.get({path}, (req, res) => {{\n")
                 continue
 
-            elif "post " in token.lex:
+            elif token.lex and "post " in token.lex:
                 path = token.content.strip()
-                f.write(f"{token.indent}app.post({path}, (req, res) => {{\n")
+                f.write(f"{indent}app.post({path}, (req, res) => {{\n")
                 continue
 
-            elif "put " in token.lex:
+            elif token.lex and "put " in token.lex:
                 path = token.content.strip()
-                f.write(f"{token.indent}app.put({path}, (req, res) => {{\n")
+                f.write(f"{indent}app.put({path}, (req, res) => {{\n")
                 continue
 
-            elif "delete " in token.lex:
+            elif token.lex and "delete " in token.lex:
                 path = token.content.strip()
-                f.write(f"{token.indent}app.delete({path}, (req, res) => {{\n")
+                f.write(f"{indent}app.delete({path}, (req, res) => {{\n")
                 continue
 
-            elif "send " in token.lex:
+            elif token.lex and "send " in token.lex:
                 content = token.content.strip()
-                f.write(f"{token.indent}    res.send({content});\n")
+                f.write(f"{indent}    res.send({content});\n")
                 continue
 
-            elif "json " in token.lex:
+            elif token.lex and "json " in token.lex:
                 content = token.content.strip()
-                f.write(f"{token.indent}    res.json({content});\n")
+                f.write(f"{indent}    res.json({content});\n")
                 continue
 
-            elif "print " in token.lex:
+            elif token.lex and "print " in token.lex:
                 content = token.content.strip()
-                f.write(f'{token.indent}alert({content});\n')
+                f.write(f'{indent}alert({content});\n')
                 continue
 
-            elif "startS " in token.lex:
+            elif token.lex and "startS " in token.lex:
                 server_port = token.content.strip()
-                f.write(f"app.listen({server_port}, () => {{\n")
-                f.write(f"  console.log('🚀 ЗАПУСК СЕРВЕРА 🚀');\n")
-                f.write(f"  console.log('\\x1b[34m Сервер запущен на порту -> {server_port} \\x1b[0m');\n")
-                f.write("});\n")
+                f.write(f"{indent}app.listen({server_port}, () => {{\n")
+                f.write(f"{indent}  console.log('🚀 ЗАПУСК СЕРВЕРА 🚀');\n")
+                f.write(f"{indent}  console.log('\\x1b[34m Сервер запущен на порту -> {server_port} \\x1b[0m');\n")
+                f.write(f"{indent}}});\n")
                 continue
 
-            elif "fun " in token.lex:
-                indent = token.indent if hasattr(token, 'indent') else ''
+            elif token.lex and "fun " in token.lex:
                 content = token.content.strip()
                 func_body = content[4:] if content.startswith('fun ') else content
 
