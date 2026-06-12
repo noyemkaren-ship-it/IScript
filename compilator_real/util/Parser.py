@@ -67,14 +67,14 @@ def Parser(js_name):
                             f.write(f"{token.indent}    this.{field} = {field};\n")
                         f.write(f"{token.indent}}}\n")
                     continue
-                if token.content.strip().endwith("`"):
+                if token.content.strip().endswith("`"):
                     if token.content.count("`") < 2 and backtic == False:
                         backtic = True
                     elif token.content.count("`") < 2 and backtic:
                         backtic = False
-                if token.content.strip().endwith("(") and skobki == False and backtic == False:
+                elif token.content.strip().endswith("(") and skobki == False and backtic == False:
                     skobki = True
-                elif token.content.strip().endwith(")") and skobki == True and backtic == False:
+                elif token.content.strip().endswith(")") and skobki == True and backtic == False:
                     skobki = False
                 if "if" in token.content or "elif" in token.content or "else" in token.content or "while" in token.content or "for" in token.content or "function" in token.content or "fun " in token.content or token.content.strip().endswith(
                         "{") or "(" in token.content or backtic or skobki:
