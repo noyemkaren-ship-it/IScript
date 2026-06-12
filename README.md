@@ -7,6 +7,10 @@
 git clone https://github.com/noyemkaren-ship-it/IScript.git
 cd IScript
 pip install colorama pydantic
+или же запустить файлы в папке dependency там есть два файла linux.sh и macos.sh uhe,j ujdjhz 'nj lkz pfdbcbvjcntq'
+Также есть свое расширения в vs code 
+вот что нужно вести
+IScript Language Support
 
 ## 🎮 Быстрый старт за 30 секунд
 
