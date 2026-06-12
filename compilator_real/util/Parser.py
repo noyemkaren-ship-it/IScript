@@ -1,9 +1,6 @@
 from colorama import Fore
 from util.tokens import tokens, peremem_nubers_name
 
-from compilator_real.util.Token import Token
-
-
 def is_numeric(value):
     value = value.strip().strip('"').strip("'")
     try:
@@ -13,7 +10,9 @@ def is_numeric(value):
         return False
 
 
+
 def Parser(js_name):
+    backtic = False
     with open(f"build/{js_name}", "a") as f:
         for token in tokens:
             if token.lex is None:
@@ -67,12 +66,20 @@ def Parser(js_name):
                             f.write(f"{token.indent}    this.{field} = {field};\n")
                         f.write(f"{token.indent}}}\n")
                     continue
-                if "if" in token.content or "elif" in token.content or "else" in token.content or "while" in token.content or "for" in token.content or "function" in token.content or "fun" or token.content.strip().endswith("{"):
+                if token.content.strip().endwith("`"):
+                    if token.content.count("`") < 2 and backtic == False:
+                        backtic = True
+                    elif token.content.count("`") < 2 and backtic:
+                        backtic = False
+
+                if "if" in token.content or "elif" in token.content or "else" in token.content or "while" in token.content or "for" in token.content or "function" in token.content or "fun" or token.content.strip().endswith("{") or "(" in token.content or backtic:
                     f.write(f"{token.content}\n")
-                elif token.content.strip().endswith("n^"):
-                    f.write(f"{token.content}\n")
+                    continue
+                elif token.content.strip().endswith("n^") or token.content.strip().endswith("^n"):
+                    f.write(f"{token.content.replace("n^", "")}\n")
+                    continue
                 else:
-                    f.write(f"{token.content};\n")
+                    f.write(f"{token.content};\n");
                     print(f"В строке {token.content} была автоматический добавлена ; если я поставил лишнее то просто в конец добавьте n^")
                 continue
 
