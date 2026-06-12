@@ -183,6 +183,31 @@ startS 8080
 
 Если порт не указан, используется 3000 по умолчанию.
 
+## Подключения атвоматической функции рендаринга
+Если написать renderS
+тогда автоматический создлатсья вот такая функция
+fun renderPage(file, data) {                                          // ← "fun" — невалидный JS!
+    html %= fs.readFileSync(__dirname + "/views/" + file, "utf8")    // ← "html %=" — невалидный JS!
+    ejs.render(html, data)                                           // ← нет return
+}
+Пример кода:
+initS
+renderS
+
+ejs#=require("ejs")
+fs#=require("fs")
+
+app.set("view engine", "ejs")
+app.set("views", __dirname + "/views")
+
+get "/" {
+    res.send(renderPage("index.ejs", { name: "IronScript", version: "2.0", days: 3 }))
+})
+
+startS 3000
+Также спомощью него вы можете передатьв  html данные и выводить из и взаимодействовать с ними через
+{{ переменная }}
+
 ### Маршруты (БАЗОВЫЙ СИНТАКСИС — РАБОТАЕТ СЕЙЧАС)
 
 initS

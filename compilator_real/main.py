@@ -51,20 +51,26 @@ try:
                 fw.write("   console.log('Файл успешно обновлен.');\n")
                 fw.write("}\n")
 
-        # Проверяем initS
         if "initS" in full_content:
             with open(f"build/{bek_compilat}", "a") as fw:
-                fw.write("const express = require('express');\n")  # ← убрал двойной const
+                fw.write("const express = require('express');\n")
                 fw.write("const app = express();\n")
                 fw.write("const path = require('path');\n")
             print("Константы express и app и path были созданы автоматический!")
+        elif "renderS" in full_content:
+            with open(f"build/{bek_compilat}", "a") as fw:
+                fw.write("function renderPage(file, data) {\n")
+                fw.write("    const html = fs.readFileSync(__dirname + '/views/' + file, 'utf8');\n")
+                fw.write("    return ejs.render(html, data);\n")
+                fw.write("}\n")
 
-        # Обрабатываем построчно
         st = 0
         for line in full_content.split('\n'):
             st += 1
 
             if line.startswith("initS"):
+                continue
+            elif line.startswith("renderS"):
                 continue
             elif line.startswith("html "):
                 html_mode = True
