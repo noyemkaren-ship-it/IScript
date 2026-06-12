@@ -56,7 +56,13 @@ try:
                 fw.write("const express = require('express');\n")
                 fw.write("const app = express();\n")
                 fw.write("const path = require('path');\n")
-            print("Константы express и app и path были созданы автоматический!")
+                fw.write("const ejs = require('ejs');\n")
+                fw.write("const fs = require('fs');\n")   # ← ИСПРАВИЛ КАВЫЧКИ
+                fw.write("app.use(express.static(path.join(__dirname, 'public')));\n")
+                fw.write("app.use(express.urlencoded({ extended: true }));\n")
+                fw.write("app.use(express.json());\n")
+            print(
+                "ГОТОВО INITS СРАБОТАЛО НО УБЕДИТЕСЬ ЧТО ВЫ ПИСАЛИ В ТЕРМИНАЛЕ npm init -y && npm install express && npm install ejs")
         elif "renderS" in full_content:
             with open(f"build/{bek_compilat}", "a") as fw:
                 fw.write("function renderPage(file, data) {\n")
