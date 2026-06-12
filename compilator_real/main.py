@@ -96,6 +96,8 @@ try:
             elif html_mode:
                 parser_html(html_file_name, line)
             else:
+                if render:
+                    continue
                 AntiBag(line, st)
                 CreateToken(line)
 except FileNotFoundError:
