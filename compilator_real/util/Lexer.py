@@ -7,7 +7,11 @@ commands = {
     "print ",
     "echo ",
     "fun ",
-    "startS "
+    "startS ",
+    "get ",
+    "post ",
+    "put ",
+    "delete "
 }
 def Lexer(token):
     for lex in commands:

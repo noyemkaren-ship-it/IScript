@@ -92,6 +92,21 @@ def Parser(js_name):
                 content = token.content.strip()
                 f.write(f'{token.indent}console.log({content});\n')
                 continue
+            elif "get" in token.lex:
+                content = token.content.strip()
+                f.write(f"{token.indent}app.get({content[:1]}, (req, res) => " + "{")
+                continue
+            elif "post" in token.lex:
+                content = token.content.strip()
+                f.write(f"{token.indent}app.post({content[:1]}, (req, res) => " + "{")
+                continue
+            elif "put" in token.lex:
+                content = token.content.strip()
+                f.write(f"{token.indent}app.put({content[:1]}, (req, res) => " + "{")
+                continue
+            elif "delete" in token.lex:
+                content = token.content.strip()
+                f.write(f"{token.indent}app.delete({content[:1]}, (req, res) => " + "{")
             elif "print " in token.lex:
                 content = token.content.strip()
                 f.write(f'{token.indent}alert({content});\n')

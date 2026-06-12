@@ -262,7 +262,94 @@ app.post("/api/data", (req, res) => { n^
 startS 8080
 
 Обрати внимание на n^ после { и } — это запрещает компилятору ставить лишние ; которые сломали бы синтаксис Express.
+# ИСПОЛЬЗОВАНИЯ ЧИСТОГО ISCRIPT И ВОТ ЧТО ЭТО ТАКОЕ 
+## 🚀 Express команды — сервер без боли
 
+IronScript вводит нативные команды для работы с Express. Больше никаких app.get(), app.post(), (req, res) => и прочего boilerplate!
+
+Маршруты одной строкой:
+
+text
+get "/" {
+    send "OK"
+}
+Компилируется в:
+
+app.get("/", (req, res) => {
+    res.send("OK");
+});
+Все HTTP методы:
+
+get "/api/users" {
+    json users
+}
+
+post "/api/users" {
+    echo "Пользователь создан!"
+    send "OK"
+}
+
+put "/api/users/:id" {
+    json updated_user
+}
+
+delete "/api/users/:id" {
+    send "Удалено"
+}
+Полный пример REST API:
+
+initS
+
+TypeLego User *=* id % name % email
+
+users %= []
+
+get "/api/users" {
+    json users
+}
+
+post "/api/users" {
+    echo "Добавлен новый пользователь"
+    send "OK"
+}
+
+get "/api/users/:id" {
+    json user
+}
+
+delete "/api/users/:id" {
+    echo "Пользователь удалён"
+    send "OK"
+}
+
+startS 8080
+Это ВЕСЬ сервер. Один файл. Без require, без async, без (req, res) =>, без function. Просто чистая логика!
+
+Сравнение с JavaScript:
+
+JavaScript + Express (30 строк):
+
+const express = require('express');
+const app = express();
+app.get('/api/users', (req, res) => {
+    res.json(users);
+});
+app.post('/api/users', (req, res) => {
+    res.send('OK');
+});
+app.listen(8080, () => {
+    console.log('Сервер запущен');
+});
+IronScript (7 строк):
+
+get "/api/users" {
+    json users
+}
+post "/api/users" {
+    send "OK"
+}
+startS 8080
+Меньше кода, меньше ошибок, меньше времени. JavaScript проиграл эту войну.
 ### Отправка HTML файлов
 
 Создай HTML через html-режим и отправь его через Express:
