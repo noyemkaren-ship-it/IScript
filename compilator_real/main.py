@@ -97,7 +97,7 @@ try:
                 parser_html(html_file_name, line)
             else:
                 if render:
-                    continue
+                    pass
                 AntiBag(line, st)
                 CreateToken(line)
 except FileNotFoundError:
