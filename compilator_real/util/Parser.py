@@ -16,6 +16,9 @@ def Parser(js_name):
     skobki = False
     with open(f"build/{js_name}", "a") as f:
         for token in tokens:
+            if token.content.strip() == "":
+                continue
+
             if token.lex is None:
                 if "%=" in token.content and "%=%" not in token.content:
                     peremen, content = token.content.split('%=')
@@ -70,9 +73,10 @@ def Parser(js_name):
                     continue
 
                 if token.content.strip().endswith("`"):
-                    if token.content.count("`") < 2 and backtic == False:
+                    clean = token.content.strip()
+                    if clean.count("`") < 2 and backtic == False:
                         backtic = True
-                    elif token.content.count("`") < 2 and backtic:
+                    elif clean.count("`") < 2 and backtic:
                         backtic = False
 
                 if token.content.strip().endswith("(") and skobki == False and backtic == False:
@@ -80,9 +84,8 @@ def Parser(js_name):
                 elif token.content.strip().endswith(")") and skobki == True and backtic == False:
                     skobki = False
 
-                # ← ИСПРАВЛЕНО: "fun " вместо "fun"
                 if "if" in token.content or "elif" in token.content or "else" in token.content or "while" in token.content or "for" in token.content or "function" in token.content or "fun " in token.content or token.content.strip().endswith(
-                        "{") or "(" in token.content or backtic or skobki:
+                        "{") or "(" in token.content or backtic or skobki or token.content.strip().endswith("}"):
                     f.write(f"{token.content}\n")
                     continue
 
