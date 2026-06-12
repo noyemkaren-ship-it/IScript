@@ -1,4 +1,4 @@
-from compilator_real.util.parserHtml import parser_html
+from util.parserHtml import parser_html
 from util.Lexer import CreateToken
 from util.Parser import Parser
 from util.Lexer import AntiBag
