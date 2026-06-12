@@ -30,32 +30,38 @@ print("ПРЕДУПРЕЖДЕНИЕ ЗАРАНЕЕ ; НЕ НУНЖЫ ВООБЩ�
 
 try:
     with open(f"script/{what_compilat}", "r") as f:
-        st = 0
-        if "AppHtml" in f.read() or "AppApend" in f.read():
-            with open(f"build/{bek_compilat}", "a") as f:
-                f.write("import { writeFile, readFile, appendFile } from 'node:fs/promises';\n")
-                f.write("import { join } from 'node:path';\n")
-                f.write(" \n")
-                f.write("async function AppHtml(file, code) {\n")
-                f.write("   const filePath = join(process.cwd(), file);\n")
-                f.write("   await writeFile(filePath, code, 'utf-8');")
-                f.write("   console.log('Файл успешно создан.');\n")
-                f.write("}\n")
-                f.write(" \n")
-                f.write("async function AppApend(file, code) {\n")
-                f.write("   const filePath = join(process.cwd(), file);\n")
-                f.write("   await appendFile(filePath, code, 'utf-8');\n")
-                f.write("   console.log('Файл успешно обновлен.');\n")
-                f.write("}\n")
+        # Читаем ВЕСЬ файл ОДИН раз
+        full_content = f.read()
 
-        if "initS" in f.read():
-            with open(f"build/{bek_compilat}", "a") as fule:
-                fule.write("const const express = require('express');\n")
-                fule.write("const app = express();\n")
-                fule.write("const path = require('path');\n")
+        # Проверяем AppHtml/AppApend
+        if "AppHtml" in full_content or "AppApend" in full_content:
+            with open(f"build/{bek_compilat}", "a") as fw:
+                fw.write("import { writeFile, readFile, appendFile } from 'node:fs/promises';\n")
+                fw.write("import { join } from 'node:path';\n")
+                fw.write(" \n")
+                fw.write("async function AppHtml(file, code) {\n")
+                fw.write("   const filePath = join(process.cwd(), file);\n")
+                fw.write("   await writeFile(filePath, code, 'utf-8');")
+                fw.write("   console.log('Файл успешно создан.');\n")
+                fw.write("}\n")
+                fw.write(" \n")
+                fw.write("async function AppApend(file, code) {\n")
+                fw.write("   const filePath = join(process.cwd(), file);\n")
+                fw.write("   await appendFile(filePath, code, 'utf-8');\n")
+                fw.write("   console.log('Файл успешно обновлен.');\n")
+                fw.write("}\n")
+
+        # Проверяем initS
+        if "initS" in full_content:
+            with open(f"build/{bek_compilat}", "a") as fw:
+                fw.write("const express = require('express');\n")  # ← убрал двойной const
+                fw.write("const app = express();\n")
+                fw.write("const path = require('path');\n")
             print("Константы express и app и path были созданы автоматический!")
 
-        for line in f:
+        # Обрабатываем построчно
+        st = 0
+        for line in full_content.split('\n'):
             st += 1
 
             if line.startswith("initS"):
@@ -63,16 +69,15 @@ try:
             elif line.startswith("html "):
                 html_mode = True
                 html_file_name = line[len("html "):].strip()
-                with open(f"build/{bek_compilat}", "w") as fule:
-                    fule.write("\n")
                 continue
             elif line.startswith("html-end"):
                 html_mode = False
                 continue
             elif html_mode:
                 parser_html(html_file_name, line)
-            AntiBag(line, st)
-            CreateToken(line)
+            else:
+                AntiBag(line, st)
+                CreateToken(line)
 except FileNotFoundError:
     print(Fore.RED + f"ФАЙЛ {what_compilat} НЕ НАЙДЕН")
 

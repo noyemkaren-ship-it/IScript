@@ -76,8 +76,8 @@ def Parser(js_name):
                     skobki = True
                 elif token.content.strip().endwith(")") and skobki == True and backtic == False:
                     skobki = False
-
-                if "if" in token.content or "elif" in token.content or "else" in token.content or "while" in token.content or "for" in token.content or "function" in token.content or "fun" or token.content.strip().endswith("{") or "(" in token.content or backtic or skobki:
+                if "if" in token.content or "elif" in token.content or "else" in token.content or "while" in token.content or "for" in token.content or "function" in token.content or "fun " in token.content or token.content.strip().endswith(
+                        "{") or "(" in token.content or backtic or skobki:
                     f.write(f"{token.content}\n")
                     continue
                 elif token.content.strip().endswith("n^") or token.content.strip().endswith("^n"):
