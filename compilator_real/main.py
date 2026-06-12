@@ -64,7 +64,7 @@ try:
                 fw.write("app.use(express.json());\n")
             print(
                 "ГОТОВО INITS СРАБОТАЛО НО УБЕДИТЕСЬ ЧТО ВЫ ПИСАЛИ В ТЕРМИНАЛЕ npm init -y && npm install express && npm install ejs")
-        elif "renderS" in full_content:
+        if "renderS" in full_content:
             with open(f"build/{bek_compilat}", "a") as fw:
                 fw.write("function renderPage(file, data) {\n")
                 fw.write("    const html = fs.readFileSync(__dirname + '/views/' + file, 'utf8');\n")
@@ -78,7 +78,7 @@ try:
 
             if line.startswith("initS"):
                 continue
-            elif line.startswith("renderS") and render == False:
+            if line.startswith("renderS") and render == False:
                 with open(f"build/{bek_compilat}", "a") as fw:
                     fw.write("function renderPage(file, data) {\n")
                     fw.write("    const html = fs.readFileSync(__dirname + '/views/' + file, 'utf8');\n")
