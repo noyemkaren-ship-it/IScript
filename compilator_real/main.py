@@ -13,6 +13,7 @@ if len(sys.argv) < 2:
     print(Fore.RED + "Укажите файл для компиляции: iscript main.i")
     sys.exit(1)
 html_file_name = ""
+render = False
 
 input_file = sys.argv[1]
 what_compilat = input_file
@@ -69,6 +70,7 @@ try:
                 fw.write("    const html = fs.readFileSync(__dirname + '/views/' + file, 'utf8');\n")
                 fw.write("    return ejs.render(html, data);\n")
                 fw.write("}\n")
+            render = True
 
         st = 0
         for line in full_content.split('\n'):
@@ -76,7 +78,13 @@ try:
 
             if line.startswith("initS"):
                 continue
-            elif line.startswith("renderS"):
+            elif line.startswith("renderS") and render == False:
+                with open(f"build/{bek_compilat}", "a") as fw:
+                    fw.write("function renderPage(file, data) {\n")
+                    fw.write("    const html = fs.readFileSync(__dirname + '/views/' + file, 'utf8');\n")
+                    fw.write("    return ejs.render(html, data);\n")
+                    fw.write("}\n")
+                render = True
                 continue
             elif line.startswith("html "):
                 html_mode = True
