@@ -7,52 +7,54 @@ def is_numeric(value):
     try:
         float(value)
         return True
-    except ValueError:  # Исправлено: конкретное исключение
+    except ValueError:
         return False
 
 
 def Parser(js_name):
     backtic = False
     skobki = False
-    with open(f"build/{js_name}", "a", encoding="utf-8") as f:  # Добавлена кодировка
+    with open(f"build/{js_name}", "a", encoding="utf-8") as f:
         for token in tokens:
             if token.content.strip() == "":
                 continue
 
             if token.lex is None:
                 if "%=" in token.content and "%=%" not in token.content:
-                    peremen, content = token.content.split('%=', 1)  # Исправлено: ограничение split
-                    value = content.strip()
-                    f.write(f'let {peremen} = {value};\n')
+                    # Сохраняем пробелы в имени переменной и значении
+                    peremen, content = token.content.split('%=', 1)
+                    # НЕ делаем strip() для сохранения пробелов в значении
+                    value = content  # убрал .strip()
+                    f.write(f'let {peremen} = {value};\n')  # убрал strip() у peremen
                     if is_numeric(value):
                         peremem_nubers_name.append(peremen.strip())
                     continue
 
                 if "#=" in token.content and "%=%" not in token.content:
-                    peremen, content = token.content.split('#=', 1)  # Исправлено: ограничение split
-                    value = content.strip()
-                    f.write(f'const {peremen} = {value};\n')
+                    peremen, content = token.content.split('#=', 1)
+                    value = content  # убрал .strip()
+                    f.write(f'const {peremen} = {value};\n')  # убрал strip()
                     continue
 
                 elif "^=" in token.content:
-                    peremen, content = token.content.split('^=', 1)  # Исправлено: ограничение split
+                    peremen, content = token.content.split('^=', 1)
                     peremen = peremen.strip()
-                    value = content.strip()
+                    value = content  # убрал .strip()
                     if peremen in peremem_nubers_name:
                         if is_numeric(value):
-                            f.write(f'{peremen} = {value};\n')
+                            f.write(f'{peremen} = {value};\n')  # убрал strip() у peremen
                         else:
                             print(Fore.RED + f"❌ ОШИБКА: Переменная {peremen} ЧИСЛОВАЯ, нельзя присвоить '{value}'!")
-                            continue  # Добавлено: пропускаем запись при ошибке
+                            continue
                     else:
-                        f.write(f'{peremen} = {value};\n')
+                        f.write(f'{peremen} = {value};\n')  # убрал strip()
                     continue
 
                 elif "%=%" in token.content:
-                    peremen, content = token.content.split('%=%', 1)  # Исправлено: ограничение split
-                    value = content.strip()
-                    f.write(f'let {peremen.strip()} = {value};\n')
-                    f.write(f'console.log({peremen.strip()});\n')
+                    peremen, content = token.content.split('%=%', 1)
+                    value = content  # убрал .strip()
+                    f.write(f'let {peremen} = {value};\n')  # убрал strip()
+                    f.write(f'console.log({peremen});\n')  # убрал strip()
                     if is_numeric(value):
                         peremem_nubers_name.append(peremen.strip())
                     continue
@@ -64,7 +66,7 @@ def Parser(js_name):
                 elif "TypeLego " in token.content:
                     content = token.content[9:].strip()
                     if " *=* " in content:
-                        class_name, fields_str = content.split(" *=* ", 1)  # Исправлено: ограничение split
+                        class_name, fields_str = content.split(" *=* ", 1)
                         class_name = class_name.strip()
                         fields = [f.strip() for f in fields_str.split("%")]
                         f.write(f"{token.indent}function {class_name}({', '.join(fields)}) {{\n")
@@ -73,19 +75,16 @@ def Parser(js_name):
                         f.write(f"{token.indent}}}\n")
                     continue
 
-                # Исправлена логика обработки backtic
                 if "`" in token.content.strip():
                     clean = token.content.strip()
-                    if clean.count("`") % 2 == 1:  # Нечётное количество - переключение
+                    if clean.count("`") % 2 == 1:
                         backtic = not backtic
 
-                # Исправлена логика обработки скобок
                 if "(" in token.content.strip() and not backtic:
                     skobki = True
                 if ")" in token.content.strip() and not backtic:
                     skobki = False
 
-                # Упрощённая проверка условий
                 if any(keyword in token.content for keyword in ["if", "elif", "else", "while", "for", "function"]) or \
                    "fun " in token.content or \
                    token.content.strip().endswith(("{", "}")) or \
@@ -145,7 +144,7 @@ def Parser(js_name):
                 continue
 
             elif "startS " in token.lex:
-                server_port = token.content.strip()  # Исправлено: было scrip, стало strip
+                server_port = token.content.strip()
                 f.write(f"app.listen({server_port}, () => {{\n")
                 f.write(f"  console.log('🚀 ЗАПУСК СЕРВЕРА 🚀');\n")
                 f.write(f"  console.log('\\x1b[34m Сервер запущен на порту -> {server_port} \\x1b[0m');\n")
@@ -153,5 +152,9 @@ def Parser(js_name):
                 continue
 
             elif "fun " in token.lex:
-                f.write(f"{token.indent}function {token.content}\n")
+                content = token.content.strip()
+                if not content.endswith('{'):
+                    f.write(f"{token.indent}function {content} {{\n")
+                else:
+                    f.write(f"{token.indent}function {content}\n")
                 continue
