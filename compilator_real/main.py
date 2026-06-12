@@ -6,7 +6,7 @@ from util.dirs import create_dirs
 from colorama import Fore
 import sys
 import os
-
+from util.tokens import tokens
 print(Fore.GREEN + "Создание папок")
 create_dirs()
 if len(sys.argv) < 2:
@@ -80,32 +80,4 @@ try:
                 CreateToken(line)
 except FileNotFoundError:
     print(Fore.RED + f"ФАЙЛ {what_compilat} НЕ НАЙДЕН")
-
 Parser(bek_compilat)
-import re
-def fix_compiled_file(js_name):
-    filepath = f"build/{js_name}"
-
-    with open(filepath, 'r', encoding='utf-8') as f:
-        content = f.read()
-
-    lines = content.split('\n')
-    fixed_lines = []
-
-    for i, line in enumerate(lines):
-        stripped = line.strip()
-
-        if not stripped:
-            fixed_lines.append('')
-            continue
-        if stripped and not stripped.endswith(('{', '}', ';', ':')):
-            if not any(keyword in stripped for keyword in ['if', 'else', 'for', 'while', 'function', '=>']):
-                if not stripped.startswith(('.', '(', ')', '[', ']')):
-                    line = line.rstrip() + ';'
-
-        fixed_lines.append(line)
-
-    with open(filepath, 'w', encoding='utf-8') as f:
-        f.write('\n'.join(fixed_lines))
-
-fix_compiled_file(bek_compilat)

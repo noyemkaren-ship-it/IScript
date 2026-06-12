@@ -32,19 +32,16 @@ def CreateToken(token):
     result = Lexer(token)
 
     if result is None:
-        tokens.append(Token(lex=None, content=token, indent=""))
+        spaces = token[:len(token) - len(token.lstrip())]
+        tokens.append(Token(lex=None, content=token, indent=spaces))
     else:
         lex, line = result
         content_position = line.find(lex)
         indent = line[:content_position]
         content = line[content_position + len(lex):]
-
-        # ✅ ИСПРАВЛЕНИЕ: НЕ УБИРАЕМ { и } ИЗ КОНТЕНТА
         clear_content = content.strip()
-        # Убираем rstrip('{').strip().rstrip('}').strip()
-
         tokens.append(Token(
-            lex=lex.strip(),
+            lex=lex,
             content=clear_content,
             indent=indent
         ))

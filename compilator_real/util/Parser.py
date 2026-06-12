@@ -22,6 +22,7 @@ def Parser(js_name):
             indent = token.indent if hasattr(token, 'indent') and token.indent else ''
 
             if token.lex is None:
+                # Обработка %= (let)
                 if "%=" in token.content and "%=%" not in token.content:
                     original_content = token.content
                     if " %= " in original_content:
@@ -88,7 +89,6 @@ def Parser(js_name):
                         peremem_nubers_name.append(peremen_clean)
                     continue
 
-                # Обработка typeC (function)
                 elif "typeC " in token.content:
                     func_def = token.content[6:].strip()
                     if not func_def.endswith('{'):
@@ -97,8 +97,8 @@ def Parser(js_name):
                         f.write(f"{indent}function {func_def}\n")
                     continue
 
-                # Обработка TypeLego (class)
                 elif "TypeLego " in token.content:
+                    print("Вижу TypeLego")
                     content = token.content[9:].strip()
                     if " *=* " in content:
                         class_name, fields_str = content.split(" *=* ", 1)
@@ -110,19 +110,16 @@ def Parser(js_name):
                         f.write(f"{indent}}}\n")
                     continue
 
-                # Отслеживание backticks
                 if "`" in token.content.strip():
                     clean = token.content.strip()
                     if clean.count("`") % 2 == 1:
                         backtic = not backtic
 
-                # Отслеживание скобок
                 if "(" in token.content.strip() and not backtic:
                     skobki = True
                 if ")" in token.content.strip() and not backtic:
                     skobki = False
 
-                # Проверка на ключевые слова и специальные конструкции
                 if any(keyword in token.content for keyword in ["if", "elif", "else", "while", "for", "return"]) or \
                         "function" in token.content or \
                         "fun " in token.content or \
@@ -133,65 +130,64 @@ def Parser(js_name):
                     else:
                         f.write(f"{indent}{token.content}\n")
                     continue
-
-                # Обработка n^ и ^n
                 elif token.content.strip().endswith(("n^", "^n")):
                     cleaned = token.content.replace('n^', '').replace('^n', '')
                     f.write(f"{indent}{cleaned}\n")
                     continue
 
-                # Всё остальное - добавляем ;
                 else:
                     content = token.content.strip()
                     if content:
                         f.write(f"{indent}{content};\n")
                     continue
 
-            # ===== ОСНОВНЫЕ КОМАНДЫ (token.lex не None) =====
-
-            if token.lex and "echo " in token.lex:
+            if token.lex and "echo" in token.lex:
+                print("Вижу echo")
                 content = token.content.strip()
                 if content:
                     f.write(f'{indent}console.log({content});\n')
                 continue
 
-            elif token.lex and "get " in token.lex:
-                path = token.content.strip()
+            elif token.lex and "get" in token.lex:
+                path = token.content.strip().rstrip('{').strip()
                 f.write(f"{indent}app.get({path}, (req, res) => {{\n")
                 continue
 
-            elif token.lex and "post " in token.lex:
-                path = token.content.strip()
+            elif token.lex and "post" in token.lex:
+                path = token.content.strip().rstrip('{').strip()
                 f.write(f"{indent}app.post({path}, (req, res) => {{\n")
                 continue
 
-            elif token.lex and "put " in token.lex:
-                path = token.content.strip()
+            elif token.lex and "put" in token.lex:
+                path = token.content.strip().rstrip('{').strip()
                 f.write(f"{indent}app.put({path}, (req, res) => {{\n")
                 continue
 
-            elif token.lex and "delete " in token.lex:
-                path = token.content.strip()
+            elif token.lex and "delete" in token.lex:
+                path = token.content.strip().rstrip('{').strip()
                 f.write(f"{indent}app.delete({path}, (req, res) => {{\n")
                 continue
 
-            elif token.lex and "send " in token.lex:
+            elif token.lex and "send" in token.lex:
                 content = token.content.strip()
                 f.write(f"{indent}    res.send({content});\n")
                 continue
 
-            elif token.lex and "json " in token.lex:
+            elif token.lex and "json" in token.lex:
+                print("Вижу json")
                 content = token.content.strip()
                 f.write(f"{indent}    res.json({content});\n")
                 continue
 
-            elif token.lex and "print " in token.lex:
+            elif token.lex and "print" in token.lex:
+                print("Вижу print")
                 content = token.content.strip()
                 if content:
                     f.write(f'{indent}alert({content});\n')
                 continue
 
-            elif token.lex and "startS " in token.lex:
+            elif token.lex and "startS" in token.lex:
+                print("Увидило startS")
                 server_port = token.content.strip()
                 f.write(f"{indent}app.listen({server_port}, () => {{\n")
                 f.write(f"{indent}  console.log('🚀 ЗАПУСК СЕРВЕРА 🚀');\n")
@@ -199,11 +195,12 @@ def Parser(js_name):
                 f.write(f"{indent}}});\n")
                 continue
 
-            elif token.lex and "fun " in token.lex:
+            elif token.lex and "fun" in token.lex:
+                print("Создания fun")
                 content = token.content.strip()
-                func_body = content
-                if not func_body.endswith('{'):
-                    f.write(f"{indent}function {func_body} {{\n")
-                else:
-                    f.write(f"{indent}function {func_body}\n")
+                func_body = content.rstrip('{').strip()
+                f.write(f"{indent}function {func_body} {{\n")
                 continue
+
+    tokens.clear()
+    peremem_nubers_name.clear()
