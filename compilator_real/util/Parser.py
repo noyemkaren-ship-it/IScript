@@ -1,6 +1,14 @@
 from colorama import Fore
 from util.tokens import tokens, peremem_nubers_name
 
+from util.commnds import ECHO_LOGIC
+
+from util.commnds import RED_ECHO_LOGIC
+
+from util.commnds import GREEN_ECHO_LOGIC
+
+from util.commnds import BLUE_ECHO_LOGIC
+
 
 def is_numeric(value):
     value = value.strip().strip('"').strip("'")
@@ -22,7 +30,6 @@ def Parser(js_name):
             indent = token.indent if hasattr(token, 'indent') and token.indent else ''
 
             if token.lex is None:
-                # Обработка %= (let)
                 if "%=" in token.content and "%=%" not in token.content:
                     original_content = token.content
                     if " %= " in original_content:
@@ -141,12 +148,25 @@ def Parser(js_name):
                         f.write(f"{indent}{content};\n")
                     continue
 
-            if token.lex and "echo" in token.lex:
+            if token.lex and "echo" in token.lex and "echo: r" not in token.lex and "echo: g" not in token.lex:
                 print("Вижу echo")
                 content = token.content.strip()
-                if content:
-                    f.write(f'{indent}console.log({content});\n')
+                f.write(f'{ECHO_LOGIC(indent, content)}')
                 continue
+
+            elif token.lex and "echo: r" in token.lex:
+                content = token.content.strip()
+                f.write(f'{RED_ECHO_LOGIC(indent, content)}')
+                continue
+
+            elif token.lex and "echo: g" in token.lex:
+                content = token.content.strip()
+                f.write(f'{GREEN_ECHO_LOGIC(indent, content)}')
+                continue
+
+            elif token.lex and "echo: b" in token.lex:
+                content = token.content.strip()
+                f.write(f"{BLUE_ECHO_LOGIC(indent, content)}")
 
             elif token.lex and "get" in token.lex:
                 path = token.content.strip().rstrip('{').strip()

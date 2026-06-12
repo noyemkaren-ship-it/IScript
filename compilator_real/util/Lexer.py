@@ -12,7 +12,9 @@ commands = {
     "put ",
     "delete ",
     "send ",
-    "json "
+    "json ",
+    "echo: r",
+    "echo: g"
 }
 
 
