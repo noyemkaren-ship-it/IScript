@@ -286,7 +286,7 @@ get "/api/users" {
 
 post "/api/users" {
     echo "Пользователь создан!"
-    send "OK"
+    res.send "OK"
 }
 
 put "/api/users/:id" {
@@ -294,7 +294,7 @@ put "/api/users/:id" {
 }
 
 delete "/api/users/:id" {
-    send "Удалено"
+    res.send "Удалено"
 }
 Полный пример REST API:
 
@@ -310,7 +310,7 @@ get "/api/users" {
 
 post "/api/users" {
     echo "Добавлен новый пользователь"
-    send "OK"
+    res.send "OK"
 }
 
 get "/api/users/:id" {
@@ -319,7 +319,7 @@ get "/api/users/:id" {
 
 delete "/api/users/:id" {
     echo "Пользователь удалён"
-    send "OK"
+    res.send "OK"
 }
 
 startS 8080
@@ -346,7 +346,7 @@ get "/api/users" {
     json users
 }
 post "/api/users" {
-    send "OK"
+    res.send "OK"
 }
 startS 8080
 Меньше кода, меньше ошибок, меньше времени. JavaScript проиграл эту войну.
