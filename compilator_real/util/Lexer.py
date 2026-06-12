@@ -1,4 +1,3 @@
-
 from colorama import Fore, Style
 from util.tokens import tokens
 from util.Token import Token
@@ -11,8 +10,11 @@ commands = {
     "get ",
     "post ",
     "put ",
-    "delete "
+    "delete ",
+    "send ",   # ← ДОБАВЛЕНО: чтобы send тоже был командой
+    "json "    # ← ДОБАВЛЕНО: чтобы json тоже был командой
 }
+
 def Lexer(token):
     for lex in commands:
         if lex in token:
@@ -30,6 +32,8 @@ def CreateToken(token):
         content_position = line.find(lex)
         indent = line[:content_position]
         clear_content = line[content_position + len(lex):].strip()
+        # ← ИСПРАВЛЕНО: убираем { и } из content, если они там есть
+        clear_content = clear_content.rstrip('{').strip().rstrip('}').strip()
         tokens.append(Token(
             lex=indent + lex,
             content=clear_content,
@@ -40,7 +44,7 @@ def CreateToken(token):
 def AntiBag(line, st: int):
     if "function" in line:
         print(Fore.RED + f"❌ ОШИБКА В СТРОКЕ {st}: Использован 'function', но принято писать 'fun'")
-    if "alert" in line and "print" not in line:  # Чтобы не срабатывало на самом print
+    if "alert" in line and "print" not in line:
         print(Fore.RED + f"❌ ОШИБКА В СТРОКЕ {st}: Использован 'alert', используйте 'print'")
     if "(" in line:
         if ")" not in line:
