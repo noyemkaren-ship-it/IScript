@@ -17,11 +17,9 @@ commands = {
 
 
 def Lexer(token):
-    # Ищем самую длинную команду, которая есть в строке
     found_lex = None
     for lex in commands:
         if lex in token:
-            # Выбираем самую длинную совпавшую команду
             if found_lex is None or len(lex) > len(found_lex):
                 found_lex = lex
 
@@ -37,18 +35,16 @@ def CreateToken(token):
         tokens.append(Token(lex=None, content=token, indent=""))
     else:
         lex, line = result
-        # Находим позицию команды в строке
         content_position = line.find(lex)
-        # Отступ - это всё, что до команды
         indent = line[:content_position]
-        # Контент - это всё после команды
         content = line[content_position + len(lex):]
-        # Убираем фигурные скобки из контента
+
+        # ✅ ИСПРАВЛЕНИЕ: НЕ УБИРАЕМ { и } ИЗ КОНТЕНТА
         clear_content = content.strip()
-        clear_content = clear_content.rstrip('{').strip().rstrip('}').strip()
+        # Убираем rstrip('{').strip().rstrip('}').strip()
 
         tokens.append(Token(
-            lex=lex.strip(),  # Сохраняем чистую команду без отступа
+            lex=lex.strip(),
             content=clear_content,
             indent=indent
         ))
