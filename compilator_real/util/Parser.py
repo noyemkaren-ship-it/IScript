@@ -21,46 +21,62 @@ def Parser(js_name):
 
             if token.lex is None:
                 if "%=" in token.content and "%=%" not in token.content:
-                    # Сохраняем пробелы в имени переменной и значении
                     peremen, content = token.content.split('%=', 1)
-                    # НЕ делаем strip() для сохранения пробелов в значении
-                    value = content  # убрал .strip()
-                    f.write(f'let {peremen} = {value};\n')  # убрал strip() у peremen
+                    value = content.strip()  # Делаем strip для чистоты значения
+                    peremen_clean = peremen.strip()  # Но имя переменной чистим
+
+                    # Проверяем, не является ли значение вызовом функции
+                    if '(' in value and ')' in value:
+                        f.write(f'let {peremen_clean} = {value};\n')
+                    else:
+                        f.write(f'let {peremen_clean} = {value};\n')
+
                     if is_numeric(value):
-                        peremem_nubers_name.append(peremen.strip())
+                        peremem_nubers_name.append(peremen_clean)
                     continue
 
                 if "#=" in token.content and "%=%" not in token.content:
                     peremen, content = token.content.split('#=', 1)
-                    value = content  # убрал .strip()
-                    f.write(f'const {peremen} = {value};\n')  # убрал strip()
+                    value = content.strip()
+                    peremen_clean = peremen.strip()
+
+                    if '(' in value and ')' in value:
+                        f.write(f'const {peremen_clean} = {value};\n')
+                    else:
+                        f.write(f'const {peremen_clean} = {value};\n')
                     continue
 
                 elif "^=" in token.content:
                     peremen, content = token.content.split('^=', 1)
                     peremen = peremen.strip()
-                    value = content  # убрал .strip()
+                    value = content.strip()
                     if peremen in peremem_nubers_name:
                         if is_numeric(value):
-                            f.write(f'{peremen} = {value};\n')  # убрал strip() у peremen
+                            f.write(f'{peremen} = {value};\n')
                         else:
                             print(Fore.RED + f"❌ ОШИБКА: Переменная {peremen} ЧИСЛОВАЯ, нельзя присвоить '{value}'!")
                             continue
                     else:
-                        f.write(f'{peremen} = {value};\n')  # убрал strip()
+                        f.write(f'{peremen} = {value};\n')
                     continue
 
                 elif "%=%" in token.content:
                     peremen, content = token.content.split('%=%', 1)
-                    value = content  # убрал .strip()
-                    f.write(f'let {peremen} = {value};\n')  # убрал strip()
-                    f.write(f'console.log({peremen});\n')  # убрал strip()
+                    value = content.strip()
+                    peremen_clean = peremen.strip()
+                    f.write(f'let {peremen_clean} = {value};\n')
+                    f.write(f'console.log({peremen_clean});\n')
                     if is_numeric(value):
-                        peremem_nubers_name.append(peremen.strip())
+                        peremem_nubers_name.append(peremen_clean)
                     continue
 
                 elif "typeC " in token.content:
-                    f.write("function " + token.content[6:] + "\n")
+                    # ИСПРАВЛЕНО: Правильная обработка typeC
+                    func_def = token.content[6:].strip()
+                    if not func_def.endswith('{'):
+                        f.write(f"function {func_def} {{\n")
+                    else:
+                        f.write(f"function {func_def}\n")
                     continue
 
                 elif "TypeLego " in token.content:
@@ -85,11 +101,13 @@ def Parser(js_name):
                 if ")" in token.content.strip() and not backtic:
                     skobki = False
 
-                if any(keyword in token.content for keyword in ["if", "elif", "else", "while", "for", "function"]) or \
-                   "fun " in token.content or \
-                   token.content.strip().endswith(("{", "}")) or \
-                   "(" in token.content or \
-                   backtic or skobki:
+                # ИСПРАВЛЕНО: Добавлена проверка на function
+                if any(keyword in token.content for keyword in ["if", "elif", "else", "while", "for"]) or \
+                        "function" in token.content or \
+                        "fun " in token.content or \
+                        token.content.strip().endswith(("{", "}")) or \
+                        "(" in token.content or \
+                        backtic or skobki:
                     f.write(f"{token.content}\n")
                     continue
 
@@ -153,8 +171,10 @@ def Parser(js_name):
 
             elif "fun " in token.lex:
                 content = token.content.strip()
-                if not content.endswith('{'):
-                    f.write(f"{token.indent}function {content} {{\n")
+                func_body = content[4:] if content.startswith('fun ') else content
+
+                if not func_body.endswith('{'):
+                    f.write(f"{token.indent}function {func_body} {{\n")
                 else:
-                    f.write(f"{token.indent}function {content}\n")
+                    f.write(f"{token.indent}function {func_body}\n")
                 continue
