@@ -21,71 +21,82 @@ def Parser(js_name):
 
             if token.lex is None:
                 if "%=" in token.content and "%=%" not in token.content:
-                    peremen, content = token.content.split('%=', 1)
+                    # ИСПРАВЛЕНО: Сохраняем оригинальный контент с отступами
+                    original_content = token.content
+                    if " %= " in original_content:
+                        peremen, content = original_content.split(' %= ', 1)
+                    else:
+                        peremen, content = original_content.split('%=', 1)
+                    indent = token.indent if hasattr(token, 'indent') else ''
                     value = content.strip()
                     peremen_clean = peremen.strip()
 
-                    # ИСПРАВЛЕНО: Добавляем точку с запятой
-                    if '(' in value and ')' in value and not value.endswith(';'):
-                        f.write(f'let {peremen_clean} = {value};\n')
-                    elif not value.endswith(';'):
-                        f.write(f'let {peremen_clean} = {value};\n')
-                    else:
-                        f.write(f'let {peremen_clean} = {value}\n')
+                    f.write(f'{indent}let {peremen_clean} = {value};\n')
 
                     if is_numeric(value):
                         peremem_nubers_name.append(peremen_clean)
                     continue
 
                 if "#=" in token.content and "%=%" not in token.content:
-                    peremen, content = token.content.split('#=', 1)
+                    original_content = token.content
+                    if " #= " in original_content:
+                        peremen, content = original_content.split(' #= ', 1)
+                    else:
+                        peremen, content = original_content.split('#=', 1)
+
+                    indent = token.indent if hasattr(token, 'indent') else ''
                     value = content.strip()
                     peremen_clean = peremen.strip()
 
-                    # ИСПРАВЛЕНО: Добавляем точку с запятой
-                    if '(' in value and ')' in value and not value.endswith(';'):
-                        f.write(f'const {peremen_clean} = {value};\n')
-                    elif not value.endswith(';'):
-                        f.write(f'const {peremen_clean} = {value};\n')
-                    else:
-                        f.write(f'const {peremen_clean} = {value}\n')
+                    f.write(f'{indent}const {peremen_clean} = {value};\n')
                     continue
 
                 elif "^=" in token.content:
-                    peremen, content = token.content.split('^=', 1)
+                    original_content = token.content
+                    if " ^= " in original_content:
+                        peremen, content = original_content.split(' ^= ', 1)
+                    else:
+                        peremen, content = original_content.split('^=', 1)
+
+                    indent = token.indent if hasattr(token, 'indent') else ''
                     peremen = peremen.strip()
                     value = content.strip()
+
                     if peremen in peremem_nubers_name:
                         if is_numeric(value):
-                            f.write(f'{peremen} = {value};\n')
+                            f.write(f'{indent}{peremen} = {value};\n')
                         else:
                             print(Fore.RED + f"❌ ОШИБКА: Переменная {peremen} ЧИСЛОВАЯ, нельзя присвоить '{value}'!")
                             continue
                     else:
-                        # ИСПРАВЛЕНО: Добавляем точку с запятой если её нет
-                        if not value.endswith(';'):
-                            f.write(f'{peremen} = {value};\n')
-                        else:
-                            f.write(f'{peremen} = {value}\n')
+                        f.write(f'{indent}{peremen} = {value};\n')
                     continue
 
                 elif "%=%" in token.content:
-                    peremen, content = token.content.split('%=%', 1)
+                    original_content = token.content
+                    if " %=% " in original_content:
+                        peremen, content = original_content.split(' %=% ', 1)
+                    else:
+                        peremen, content = original_content.split('%=%', 1)
+
+                    indent = token.indent if hasattr(token, 'indent') else ''
                     value = content.strip()
                     peremen_clean = peremen.strip()
-                    f.write(f'let {peremen_clean} = {value};\n')
-                    f.write(f'console.log({peremen_clean});\n')
+
+                    f.write(f'{indent}let {peremen_clean} = {value};\n')
+                    f.write(f'{indent}console.log({peremen_clean});\n')
+
                     if is_numeric(value):
                         peremem_nubers_name.append(peremen_clean)
                     continue
 
                 elif "typeC " in token.content:
+                    indent = token.indent if hasattr(token, 'indent') else ''
                     func_def = token.content[6:].strip()
-                    # ИСПРАВЛЕНО: Всегда добавляем { если нет
                     if not func_def.endswith('{'):
-                        f.write(f"function {func_def} {{\n")
+                        f.write(f"{indent}function {func_def} {{\n")
                     else:
-                        f.write(f"function {func_def}\n")
+                        f.write(f"{indent}function {func_def}\n")
                     continue
 
                 elif "TypeLego " in token.content:
@@ -110,18 +121,14 @@ def Parser(js_name):
                 if ")" in token.content.strip() and not backtic:
                     skobki = False
 
-                # ИСПРАВЛЕНО: Проверка на function и return
                 if any(keyword in token.content for keyword in ["if", "elif", "else", "while", "for", "return"]) or \
                         "function" in token.content or \
                         "fun " in token.content or \
                         token.content.strip().endswith(("{", "}")) or \
                         "(" in token.content or \
                         backtic or skobki:
-                    # ИСПРАВЛЕНО: Добавляем ; для return если нужно
-                    if "return" in token.content and not token.content.strip().endswith(';'):
-                        f.write(f"{token.content};\n")
-                    else:
-                        f.write(f"{token.content}\n")
+                    # Сохраняем оригинальный контент с отступами
+                    f.write(f"{token.content}\n")
                     continue
 
                 elif token.content.strip().endswith(("n^", "^n")):
@@ -129,11 +136,8 @@ def Parser(js_name):
                     continue
 
                 else:
-                    # ИСПРАВЛЕНО: Добавляем ; если это обычная строка
-                    if not token.content.strip().endswith(';'):
-                        f.write(f"{token.content};\n")
-                    else:
-                        f.write(f"{token.content}\n")
+                    # Сохраняем оригинальный контент с отступами
+                    f.write(f"{token.content};\n")
                     continue
 
             # ===== ОСНОВНЫЕ КОМАНДЫ =====
@@ -165,20 +169,12 @@ def Parser(js_name):
 
             elif "send " in token.lex:
                 content = token.content.strip()
-                # ИСПРАВЛЕНО: Добавляем ; для res.send
-                if not content.endswith(';'):
-                    f.write(f"{token.indent}    res.send({content});\n")
-                else:
-                    f.write(f"{token.indent}    res.send({content})\n")
+                f.write(f"{token.indent}    res.send({content});\n")
                 continue
 
             elif "json " in token.lex:
                 content = token.content.strip()
-                # ИСПРАВЛЕНО: Добавляем ; для res.json
-                if not content.endswith(';'):
-                    f.write(f"{token.indent}    res.json({content});\n")
-                else:
-                    f.write(f"{token.indent}    res.json({content})\n")
+                f.write(f"{token.indent}    res.json({content});\n")
                 continue
 
             elif "print " in token.lex:
@@ -195,10 +191,12 @@ def Parser(js_name):
                 continue
 
             elif "fun " in token.lex:
+                indent = token.indent if hasattr(token, 'indent') else ''
                 content = token.content.strip()
                 func_body = content[4:] if content.startswith('fun ') else content
+
                 if not func_body.endswith('{'):
-                    f.write(f"{token.indent}function {func_body} {{\n")
+                    f.write(f"{indent}function {func_body} {{\n")
                 else:
-                    f.write(f"{token.indent}function {func_body}\n")
+                    f.write(f"{indent}function {func_body}\n")
                 continue
