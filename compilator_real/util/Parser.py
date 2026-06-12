@@ -13,6 +13,7 @@ def is_numeric(value):
 
 def Parser(js_name):
     backtic = False
+    skobki = False
     with open(f"build/{js_name}", "a") as f:
         for token in tokens:
             if token.lex is None:
@@ -71,8 +72,12 @@ def Parser(js_name):
                         backtic = True
                     elif token.content.count("`") < 2 and backtic:
                         backtic = False
+                if token.content.strip().endwith("(") and skobki == False and backtic == False:
+                    skobki = True
+                elif token.content.strip().endwith(")") and skobki == True and backtic == False:
+                    skobki = False
 
-                if "if" in token.content or "elif" in token.content or "else" in token.content or "while" in token.content or "for" in token.content or "function" in token.content or "fun" or token.content.strip().endswith("{") or "(" in token.content or backtic:
+                if "if" in token.content or "elif" in token.content or "else" in token.content or "while" in token.content or "for" in token.content or "function" in token.content or "fun" or token.content.strip().endswith("{") or "(" in token.content or backtic or skobki:
                     f.write(f"{token.content}\n")
                     continue
                 elif token.content.strip().endswith("n^") or token.content.strip().endswith("^n"):
