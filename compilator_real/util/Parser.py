@@ -112,7 +112,7 @@ def Parser(js_name):
                 f.write(f'{token.indent}alert({content});\n')
                 continue
             elif "startS " in token.lex:
-                server_port = token.content.scrip()
+                server_port = token.content.strip()
                 f.write(f"app.listen({server_port}, () => " + "{" + "\n")
                 f.write(f"  console.log('🚀ЗАПУСК СЕРВЕРА🚀');\n")
                 f.write(f"  console.log('\x1b[34m Сервер запущен на порт ->{server_port} \x1b[0m');\n")
