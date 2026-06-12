@@ -22,14 +22,16 @@ def Parser(js_name):
             if token.lex is None:
                 if "%=" in token.content and "%=%" not in token.content:
                     peremen, content = token.content.split('%=', 1)
-                    value = content.strip()  # Делаем strip для чистоты значения
-                    peremen_clean = peremen.strip()  # Но имя переменной чистим
+                    value = content.strip()
+                    peremen_clean = peremen.strip()
 
-                    # Проверяем, не является ли значение вызовом функции
-                    if '(' in value and ')' in value:
+                    # ИСПРАВЛЕНО: Добавляем точку с запятой
+                    if '(' in value and ')' in value and not value.endswith(';'):
+                        f.write(f'let {peremen_clean} = {value};\n')
+                    elif not value.endswith(';'):
                         f.write(f'let {peremen_clean} = {value};\n')
                     else:
-                        f.write(f'let {peremen_clean} = {value};\n')
+                        f.write(f'let {peremen_clean} = {value}\n')
 
                     if is_numeric(value):
                         peremem_nubers_name.append(peremen_clean)
@@ -40,10 +42,13 @@ def Parser(js_name):
                     value = content.strip()
                     peremen_clean = peremen.strip()
 
-                    if '(' in value and ')' in value:
+                    # ИСПРАВЛЕНО: Добавляем точку с запятой
+                    if '(' in value and ')' in value and not value.endswith(';'):
+                        f.write(f'const {peremen_clean} = {value};\n')
+                    elif not value.endswith(';'):
                         f.write(f'const {peremen_clean} = {value};\n')
                     else:
-                        f.write(f'const {peremen_clean} = {value};\n')
+                        f.write(f'const {peremen_clean} = {value}\n')
                     continue
 
                 elif "^=" in token.content:
@@ -57,7 +62,11 @@ def Parser(js_name):
                             print(Fore.RED + f"❌ ОШИБКА: Переменная {peremen} ЧИСЛОВАЯ, нельзя присвоить '{value}'!")
                             continue
                     else:
-                        f.write(f'{peremen} = {value};\n')
+                        # ИСПРАВЛЕНО: Добавляем точку с запятой если её нет
+                        if not value.endswith(';'):
+                            f.write(f'{peremen} = {value};\n')
+                        else:
+                            f.write(f'{peremen} = {value}\n')
                     continue
 
                 elif "%=%" in token.content:
@@ -71,8 +80,8 @@ def Parser(js_name):
                     continue
 
                 elif "typeC " in token.content:
-                    # ИСПРАВЛЕНО: Правильная обработка typeC
                     func_def = token.content[6:].strip()
+                    # ИСПРАВЛЕНО: Всегда добавляем { если нет
                     if not func_def.endswith('{'):
                         f.write(f"function {func_def} {{\n")
                     else:
@@ -101,14 +110,18 @@ def Parser(js_name):
                 if ")" in token.content.strip() and not backtic:
                     skobki = False
 
-                # ИСПРАВЛЕНО: Добавлена проверка на function
-                if any(keyword in token.content for keyword in ["if", "elif", "else", "while", "for"]) or \
+                # ИСПРАВЛЕНО: Проверка на function и return
+                if any(keyword in token.content for keyword in ["if", "elif", "else", "while", "for", "return"]) or \
                         "function" in token.content or \
                         "fun " in token.content or \
                         token.content.strip().endswith(("{", "}")) or \
                         "(" in token.content or \
                         backtic or skobki:
-                    f.write(f"{token.content}\n")
+                    # ИСПРАВЛЕНО: Добавляем ; для return если нужно
+                    if "return" in token.content and not token.content.strip().endswith(';'):
+                        f.write(f"{token.content};\n")
+                    else:
+                        f.write(f"{token.content}\n")
                     continue
 
                 elif token.content.strip().endswith(("n^", "^n")):
@@ -116,7 +129,11 @@ def Parser(js_name):
                     continue
 
                 else:
-                    f.write(f"{token.content};\n")
+                    # ИСПРАВЛЕНО: Добавляем ; если это обычная строка
+                    if not token.content.strip().endswith(';'):
+                        f.write(f"{token.content};\n")
+                    else:
+                        f.write(f"{token.content}\n")
                     continue
 
             # ===== ОСНОВНЫЕ КОМАНДЫ =====
@@ -148,12 +165,20 @@ def Parser(js_name):
 
             elif "send " in token.lex:
                 content = token.content.strip()
-                f.write(f"{token.indent}    res.send({content})\n")
+                # ИСПРАВЛЕНО: Добавляем ; для res.send
+                if not content.endswith(';'):
+                    f.write(f"{token.indent}    res.send({content});\n")
+                else:
+                    f.write(f"{token.indent}    res.send({content})\n")
                 continue
 
             elif "json " in token.lex:
                 content = token.content.strip()
-                f.write(f"{token.indent}    res.json({content})\n")
+                # ИСПРАВЛЕНО: Добавляем ; для res.json
+                if not content.endswith(';'):
+                    f.write(f"{token.indent}    res.json({content});\n")
+                else:
+                    f.write(f"{token.indent}    res.json({content})\n")
                 continue
 
             elif "print " in token.lex:
@@ -172,7 +197,6 @@ def Parser(js_name):
             elif "fun " in token.lex:
                 content = token.content.strip()
                 func_body = content[4:] if content.startswith('fun ') else content
-
                 if not func_body.endswith('{'):
                     f.write(f"{token.indent}function {func_body} {{\n")
                 else:
