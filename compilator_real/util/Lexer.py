@@ -14,7 +14,8 @@ commands = {
     "send ",
     "json ",
     "echo: r",
-    "echo: g"
+    "echo: g",
+    "echo: b",
 }
 
 
