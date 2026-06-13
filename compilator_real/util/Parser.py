@@ -148,7 +148,7 @@ def Parser(js_name):
                         f.write(f"{indent}{content};\n")
                     continue
 
-            if token.lex.strip().startwith("echo"):
+            if token.lex.strip().startswith("echo"):
                 if token.lex and "echo" in token.lex and "echo: r" not in token.lex and "echo: g" not in token.lex:
                     print("Вижу echo")
                     content = token.content.strip()
@@ -175,7 +175,7 @@ def Parser(js_name):
                 f.write(f"{indent}app.get({path}, (req, res) => {{\n")
                 continue
 
-            elif token.lax.strip().startwith("p"):
+            elif token.lax.strip().startswith("p"):
                 if token.lex and "post" in token.lex:
                     path = token.content.strip().rstrip('{').strip()
                     f.write(f"{indent}app.post({path}, (req, res) => {{\n")
