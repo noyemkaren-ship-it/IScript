@@ -17,7 +17,7 @@ def RED_ECHO_LOGIC(indent, content):
     return make_echo(indent, content, color_code=r"\x1b[31m")
 
 def GREEN_ECHO_LOGIC(indent, content):
-    return make_echo(indent, content, color_code=r"\x1b[32m"
+    return make_echo(indent, content, color_code=r"\x1b[32m")
 
 def BLUE_ECHO_LOGIC(indent, content):
     return make_echo(indent, content, color_code=r"\x1b[34m")
