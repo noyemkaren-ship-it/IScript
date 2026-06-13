@@ -175,7 +175,7 @@ def Parser(js_name):
                 f.write(f"{indent}app.get({path}, (req, res) => {{\n")
                 continue
 
-            elif token.lax.strip().startswith("p"):
+            elif token.lex.strip().startswith("p"):
                 if token.lex and "post" in token.lex:
                     path = token.content.strip().rstrip('{').strip()
                     f.write(f"{indent}app.post({path}, (req, res) => {{\n")
