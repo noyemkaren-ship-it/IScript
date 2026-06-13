@@ -148,40 +148,50 @@ def Parser(js_name):
                         f.write(f"{indent}{content};\n")
                     continue
 
-            if token.lex and "echo" in token.lex and "echo: r" not in token.lex and "echo: g" not in token.lex:
-                print("Вижу echo")
-                content = token.content.strip()
-                f.write(f'{ECHO_LOGIC(indent, content)}')
-                continue
+            if token.lex.strip().startwith("echo"):
+                if token.lex and "echo" in token.lex and "echo: r" not in token.lex and "echo: g" not in token.lex:
+                    print("Вижу echo")
+                    content = token.content.strip()
+                    f.write(f'{ECHO_LOGIC(indent, content)}')
+                    continue
 
-            elif token.lex and "echo: r" in token.lex:
-                content = token.content.strip()
-                f.write(f'{RED_ECHO_LOGIC(indent, content)}')
-                continue
+                elif token.lex and "echo: r" in token.lex:
+                    content = token.content.strip()
+                    f.write(f'{RED_ECHO_LOGIC(indent, content)}')
+                    continue
 
-            elif token.lex and "echo: g" in token.lex:
-                content = token.content.strip()
-                f.write(f'{GREEN_ECHO_LOGIC(indent, content)}')
-                continue
+                elif token.lex and "echo: g" in token.lex:
+                    content = token.content.strip()
+                    f.write(f'{GREEN_ECHO_LOGIC(indent, content)}')
+                    continue
 
-            elif token.lex and "echo: b" in token.lex:
-                content = token.content.strip()
-                f.write(f"{BLUE_ECHO_LOGIC(indent, content)}")
+                elif token.lex and "echo: b" in token.lex:
+                    content = token.content.strip()
+                    f.write(f"{BLUE_ECHO_LOGIC(indent, content)}")
+                    continue
 
             elif token.lex and "get" in token.lex:
                 path = token.content.strip().rstrip('{').strip()
                 f.write(f"{indent}app.get({path}, (req, res) => {{\n")
                 continue
 
-            elif token.lex and "post" in token.lex:
-                path = token.content.strip().rstrip('{').strip()
-                f.write(f"{indent}app.post({path}, (req, res) => {{\n")
-                continue
+            elif token.lax.strip().startwith("p"):
+                if token.lex and "post" in token.lex:
+                    path = token.content.strip().rstrip('{').strip()
+                    f.write(f"{indent}app.post({path}, (req, res) => {{\n")
+                    continue
 
-            elif token.lex and "put" in token.lex:
-                path = token.content.strip().rstrip('{').strip()
-                f.write(f"{indent}app.put({path}, (req, res) => {{\n")
-                continue
+                elif token.lex and "put" in token.lex:
+                    path = token.content.strip().rstrip('{').strip()
+                    f.write(f"{indent}app.put({path}, (req, res) => {{\n")
+                    continue
+                elif token.lex and "print" in token.lex:
+                    print("Вижу print")
+                    content = token.content.strip()
+                    if content:
+                        f.write(f'{indent}alert({content});\n')
+                    continue
+
 
             elif token.lex and "delete" in token.lex:
                 path = token.content.strip().rstrip('{').strip()
@@ -199,12 +209,6 @@ def Parser(js_name):
                 f.write(f"{indent}    res.json({content});\n")
                 continue
 
-            elif token.lex and "print" in token.lex:
-                print("Вижу print")
-                content = token.content.strip()
-                if content:
-                    f.write(f'{indent}alert({content});\n')
-                continue
 
             elif token.lex and "startS" in token.lex:
                 print("Увидило startS")
