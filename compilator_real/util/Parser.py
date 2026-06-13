@@ -216,6 +216,7 @@ def Parser(js_name):
                 f.write(f"{indent}app.listen({server_port}, () => {{\n")
                 f.write(f"{indent}  console.log('🚀 ЗАПУСК СЕРВЕРА 🚀');\n")
                 f.write(f"{indent}  console.log('\\x1b[34m Сервер запущен на порту -> {server_port} \\x1b[0m');\n")
+                f.write(f"{indent}  console.log('\\x1b[34m Можно найти по сыллку -> http://localhost:{server_port} \\x1b[0m');\n")
                 f.write(f"{indent}}});\n")
                 continue
 
