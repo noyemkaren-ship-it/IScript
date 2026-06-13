@@ -1,14 +1,6 @@
 from colorama import Fore
 from util.tokens import tokens, peremem_nubers_name
-
-from util.commnds import ECHO_LOGIC
-
-from util.commnds import RED_ECHO_LOGIC
-
-from util.commnds import GREEN_ECHO_LOGIC
-
-from util.commnds import BLUE_ECHO_LOGIC
-
+from util.commnds import ECHO_LOGIC, RED_ECHO_LOGIC, GREEN_ECHO_LOGIC, BLUE_ECHO_LOGIC
 
 def is_numeric(value):
     value = value.strip().strip('"').strip("'")
@@ -17,7 +9,6 @@ def is_numeric(value):
         return True
     except ValueError:
         return False
-
 
 def Parser(js_name):
     backtic = False
@@ -145,7 +136,10 @@ def Parser(js_name):
                 else:
                     content = token.content.strip()
                     if content:
-                        f.write(f"{indent}{content};\n")
+                        if content.endswith(('{', '}')) or content.strip().startswith(('else', 'elif')):
+                            f.write(f"{indent}{content}\n")
+                        else:
+                            f.write(f"{indent}{content};\n")
                     continue
 
             if token.lex.strip().startswith("echo"):
@@ -192,7 +186,6 @@ def Parser(js_name):
                         f.write(f'{indent}alert({content});\n')
                     continue
 
-
             elif token.lex and "delete" in token.lex:
                 path = token.content.strip().rstrip('{').strip()
                 f.write(f"{indent}app.delete({path}, (req, res) => {{\n")
@@ -208,7 +201,6 @@ def Parser(js_name):
                 content = token.content.strip()
                 f.write(f"{indent}    res.json({content});\n")
                 continue
-
 
             elif token.lex and "startS" in token.lex:
                 print("Увидило startS")
