@@ -137,7 +137,7 @@ def Parser(js_name):
                     else:
                         f.write(f"{indent}{token.content}\n")
                     continue
-                elif token.content.strip().endswith(("n^", "^n")):
+                elif token.content.strip().endswith(("n^", "^n")) or token.content.strip().endswith(","):
                     cleaned = token.content.replace('n^', '').replace('^n', '')
                     f.write(f"{indent}{cleaned}\n")
                     continue
